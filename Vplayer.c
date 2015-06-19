@@ -1,3 +1,8 @@
+//
+//		The following information is based on :
+//		http://dranger.com/ffmpeg/tutorial01.html
+//
+
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavformat/avio.h>
@@ -43,36 +48,26 @@ typedef struct VideoPicture{
 } VideoPicture;
 
 typedef struct VideoState{
-	int videoIndex;
-	int color_req;
-	int seek_req;
-	int seek_flag;
-	int64_t seek_pos;
-	AVFormatContext *pFormatCtx;
+	int videoIndex, color_req, seek_req, seek_flag;
 	int videoStream, audioStream;
 	int av_sync_type;
-	double external_clock; 
+	int audio_pkt_size, audio_hw_buf_size;
+	int64_t seek_pos;
 	int64_t external_clock_time;
-	double audio_clock;
+	double external_clock, audio_clock; 
+	AVFormatContext *pFormatCtx;
 	AVStream *audio_st;
-	PacketQueue audioq;
+	PacketQueue audioq;	// Struct PacketQueue defined above
 	uint8_t audio_buf[(AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2];
-	unsigned int audio_buf_size;
-	unsigned int audio_buf_index;
+	unsigned int audio_buf_size,  audio_buf_index;
 	AVPacket audio_pkt;
 	uint8_t *audio_pkt_data;
-	int audio_pkt_size;
 	AVFrame audio_frame;
 	AVStream *video_st;
 	PacketQueue videoq;
-	int audio_hw_buf_size;
-	double audio_diff_cum; 
-	double audio_diff_avg_coef;
-	double audio_diff_threshold;
+	double audio_diff_cum, audio_diff_avg_coef, audio_diff_threshold; 
 	int audio_diff_avg_count;
-	double frame_timer;
-	double frame_last_pts;
-	double frame_last_delay;
+	double frame_timer, frame_last_pts, frame_last_delay;
 	double video_current_pts; ///<current displayed pts (different from video_clock if frame fifos are used)
 	int64_t video_current_pts_time; ///<time (av_gettime) at which we updated video_current_pts - used to have running video pts
 	double video_clock; ///<pts of last decoded frame / predicted pts of next decoded frame
